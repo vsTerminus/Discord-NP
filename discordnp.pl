@@ -1,0 +1,97 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use warnings;
+use strict;
+
+use Net::LastFM;
+use Net::Discord;
+use Config::Tiny;
+
+my $config = Config::Tiny->new;
+my $config_file = $ARGV[0] // 'config.ini';
+
+$config = Config::Tiny->read( $config_file, 'utf8' );
+say localtime(time) . " - Loaded Config: $config_file";
+
+my $last_played = "";
+my $interval = $config->{'lastfm'}->{'interval'};
+
+my $lastfm = Net::LastFM->new(
+    api_key    => $config->{'lastfm'}->{'api_key'},
+    api_secret => $config->{'lastfm'}->{'api_secret'},
+);
+
+my $discord = Net::Discord->new(
+    {
+        # Ctrl+Shift+I and type localStorage.token in the console to get the user token.
+        'token' => $config->{'discord'}->{'token'},
+        'token_type' => 'Bearer',
+        'name'  => 'Discord Now Playing',
+        'url'   => 'https://github.com/vsterminus',
+        'version' => '1.0',
+        'verbose' => 0,
+        'reconnect' => 0,
+        'callbacks' => {
+            'on_ready'  => \&on_ready,
+        },
+    }
+);
+
+$SIG{ALRM} = sub {
+    my $np = nowplaying();
+
+    if ( defined $np )
+    {
+        if ( $np ne $last_played )
+        {
+            $discord->status_update({'game' => $np});
+            say localtime(time) . " - Status Updated: $np";
+            $last_played = $np;
+        }
+    }
+    else
+    {
+        say localtime(time) . " - Unable to retrieve Last.FM data.";
+    }
+
+    alarm($interval);
+};
+
+sub nowplaying
+{
+    my $np = eval {
+        my $data = $lastfm->request_signed(
+            method => 'user.getRecentTracks',
+            user   => 'RageOfOrder',
+            limit  => 1,
+        );
+        
+        my $track = $data->{'recenttracks'}{'track'}[0];
+        my $np = $track->{'artist'}{'#text'} . " - " . $track->{'name'};
+    
+        return $np;
+    };
+
+    if ($@)
+    {
+        say $@;
+        return undef;
+    }
+    else
+    {
+        return $np;
+    }
+}
+
+sub on_ready
+{
+    my ($hash) = @_;
+
+    say localtime(time) . " - Connected to Discord.";
+
+    # This will trigger the Last.FM lookup.
+    alarm(1);
+}
+
+$discord->connect();
