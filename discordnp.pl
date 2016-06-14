@@ -63,7 +63,7 @@ sub nowplaying
     my $np = eval {
         my $data = $lastfm->request_signed(
             method => 'user.getRecentTracks',
-            user   => 'RageOfOrder',
+            user   => $config->{'lastfm'}->{'username'},
             limit  => 1,
         );
         
