@@ -7,6 +7,7 @@ use strict;
 use Net::LastFM;
 use Net::Discord;
 use Config::Tiny;
+use Mojo::IOLoop::Delay;
 
 my $config = Config::Tiny->new;
 my $config_file = $ARGV[0] // 'config.ini';
@@ -38,7 +39,8 @@ my $discord = Net::Discord->new(
     }
 );
 
-$SIG{ALRM} = sub {
+sub update_status
+{
     my $np = nowplaying();
 
     if ( defined $np )
@@ -55,8 +57,7 @@ $SIG{ALRM} = sub {
         say localtime(time) . " - Unable to retrieve Last.FM data.";
     }
 
-    alarm($interval);
-};
+}
 
 sub nowplaying
 {
@@ -90,8 +91,11 @@ sub on_ready
 
     say localtime(time) . " - Connected to Discord.";
 
-    # This will trigger the Last.FM lookup.
-    alarm(1);
+    # Update status immediately
+    update_status();
+
+    # This will trigger the Last.FM lookup timer
+    Mojo::IOLoop->recurring($config->{'lastfm'}->{'interval'} => sub { update_status(); });
 }
 
 $discord->connect();

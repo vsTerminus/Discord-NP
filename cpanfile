@@ -3,3 +3,4 @@
 requires 'Net::Discord';
 requires 'Net::LastFM';
 requires 'Config::Tiny';
+requires 'Mojo::IOLoop';
