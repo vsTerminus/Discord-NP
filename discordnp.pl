@@ -7,7 +7,7 @@ use strict;
 use Net::LastFM;
 use Net::Discord;
 use Config::Tiny;
-use Mojo::IOLoop::Delay;
+use Mojo::IOLoop;
 
 my $config = Config::Tiny->new;
 my $config_file = $ARGV[0] // 'config.ini';
