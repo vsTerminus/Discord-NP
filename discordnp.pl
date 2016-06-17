@@ -24,19 +24,18 @@ my $lastfm = Net::LastFM->new(
 );
 
 my $discord = Net::Discord->new(
-    {
-        # Ctrl+Shift+I and type localStorage.token in the console to get the user token.
-        'token' => $config->{'discord'}->{'token'},
-        'token_type' => 'Bearer',
-        'name'  => 'Discord Now Playing',
-        'url'   => 'https://github.com/vsterminus',
-        'version' => '1.0',
-        'verbose' => 0,
-        'reconnect' => 0,
-        'callbacks' => {
-            'on_ready'  => \&on_ready,
-        },
-    }
+    # Ctrl+Shift+I and type localStorage.token in the console to get the user token.
+    'token'         => $config->{'discord'}->{'token'},
+    'token_type'    => 'Bearer',
+    'name'          => 'Discord Now Playing',
+    'url'           => 'https://github.com/vsterminus',
+    'version'       => '1.0',
+    'verbose'       => $config->{'discord'}->{'verbose'},
+    'reconnect'     => 1,
+    'callbacks'     => {
+        'on_ready'  => \&on_ready,
+#        'on_finish' => \&on_finish,
+    },
 );
 
 sub update_status
@@ -98,4 +97,8 @@ sub on_ready
     Mojo::IOLoop->recurring($config->{'lastfm'}->{'interval'} => sub { update_status(); });
 }
 
-$discord->connect();
+# Set up the Discord Gateway Websocket connection
+$discord->init();
+
+# Start the IOLoop. This will connect to discord and begin the LastFM timers.
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
