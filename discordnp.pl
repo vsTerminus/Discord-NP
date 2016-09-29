@@ -4,7 +4,7 @@ use v5.10;
 use warnings;
 use strict;
 
-use Net::LastFM;
+use Net::Async::LastFM;
 use Net::Discord;
 use Config::Tiny;
 use Mojo::IOLoop;
@@ -18,9 +18,8 @@ say localtime(time) . " - Loaded Config: $config_file";
 my $last_played = "";
 my $interval = $config->{'lastfm'}->{'interval'};
 
-my $lastfm = Net::LastFM->new(
-    api_key    => $config->{'lastfm'}->{'api_key'},
-    api_secret => $config->{'lastfm'}->{'api_secret'},
+my $lastfm = Net::Async::LastFM->new(
+    api_key     => $config->{'lastfm'}->{'api_key'}
 );
 
 my $discord = Net::Discord->new(
@@ -40,7 +39,7 @@ my $discord = Net::Discord->new(
 
 sub update_status
 {
-    my $np = nowplaying();
+    my $np = $lastfm->nowplaying($config->{'lastfm'}->{'username'});
 
     if ( defined $np )
     {
@@ -56,32 +55,6 @@ sub update_status
         say localtime(time) . " - Unable to retrieve Last.FM data.";
     }
 
-}
-
-sub nowplaying
-{
-    my $np = eval {
-        my $data = $lastfm->request_signed(
-            method => 'user.getRecentTracks',
-            user   => $config->{'lastfm'}->{'username'},
-            limit  => 1,
-        );
-        
-        my $track = $data->{'recenttracks'}{'track'}[0];
-        my $np = $track->{'artist'}{'#text'} . " - " . $track->{'name'};
-    
-        return $np;
-    };
-
-    if ($@)
-    {
-        say $@;
-        return undef;
-    }
-    else
-    {
-        return $np;
-    }
 }
 
 sub on_ready

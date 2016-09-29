@@ -1,11 +1,11 @@
 [lastfm]
-# You will need a Last.FM Developer API for this script to work.
+# You will need a Last.FM Developer API account for this script to work.
 # There is no way around it, since the request requires an API key and I will not share my own.
 # Fortunately, this is easy to get! Simply head over to http://www.last.fm/api/account/create
 # Once your account is created, the site will display your API Key and API Secret.
 # WRITE THESE DOWN! Last.FM apparently has no way to look them up later, so don't lose them.
+# This script only requires the api key.
 api_key = xxx
-api_secret = xxx
 
 # Next, you'll also need to provide your Last.FM username for the script to query.
 username = xxx
