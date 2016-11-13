@@ -39,21 +39,26 @@ my $discord = Net::Discord->new(
 
 sub update_status
 {
-    my $np = $lastfm->nowplaying($config->{'lastfm'}->{'username'});
+    $lastfm->nowplaying($config->{'lastfm'}->{'username'}, "`artist - title`", sub 
+    {
+        my $np = shift;
 
-    if ( defined $np )
-    {
-        if ( $np ne $last_played )
+        if ( defined $np )
         {
-            $discord->status_update({'game' => $np});
-            say localtime(time) . " - Status Updated: $np";
-            $last_played = $np;
+            if ( $np ne $last_played )
+            {
+                $discord->status_update({'game' => $np});
+                say localtime(time) . " - Status Updated: $np";
+                $last_played = $np;
+            }
         }
-    }
-    else
-    {
-        say localtime(time) . " - Unable to retrieve Last.FM data.";
-    }
+        else
+        {
+            say localtime(time) . " - Unable to retrieve Last.FM data.";
+        }    
+    });
+
+    
 
 }
 
