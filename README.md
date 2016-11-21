@@ -13,3 +13,7 @@ For me it was as simple as making symlinks to the Async and Net-Discord director
     - ln -s /path/to/Net-Discord/lib/Net/Discord.pm ~/perl5/lib/perl5/Net/Discord.pm
 
 If you don't have a user lib you'll need to do this into your system perl lib directory as root instead.
+
+As for installing the other dependencies, simply running "cpanm --installdeps ." from this project's root folder should cover everything you need.
+That command will work on Linux and Windows. On Linux you'll need to install the "cpanminus" package first. 
+On Windows, it depends which distribution of Perl you are using. I recommend Strawberry Perl, which comes with cpanminus built in.
