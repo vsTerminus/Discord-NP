@@ -39,7 +39,7 @@ my $discord = Net::Discord->new(
 
 sub update_status
 {
-    $lastfm->nowplaying($config->{'lastfm'}->{'username'}, "`artist - title`", sub 
+    $lastfm->nowplaying($config->{'lastfm'}->{'username'}, "`%artist% - %title%`", sub 
     {
         my $np = shift;
 
