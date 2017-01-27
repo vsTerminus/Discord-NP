@@ -39,7 +39,9 @@ my $discord = Net::Discord->new(
 
 sub update_status
 {
-    $lastfm->nowplaying($config->{'lastfm'}->{'username'}, "`%artist% - %title%`", sub 
+    $lastfm->nowplaying({   user     => $config->{'lastfm'}->{'username'}, 
+                            format   => "`%artist% - %title%`", 
+                            callback => sub 
     {
         my $np = shift;
 
@@ -56,7 +58,7 @@ sub update_status
         {
             say localtime(time) . " - Unable to retrieve Last.FM data.";
         }    
-    });
+    }});
 
     
 
