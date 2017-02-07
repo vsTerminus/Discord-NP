@@ -40,7 +40,7 @@ my $discord = Net::Discord->new(
 sub update_status
 {
     $lastfm->nowplaying({   user     => $config->{'lastfm'}->{'username'}, 
-                            format   => "`%artist% - %title%`", 
+                            format   => "%artist% - %title%", 
                             callback => sub 
     {
         my $np = shift;
