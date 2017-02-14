@@ -4,7 +4,7 @@ use v5.10;
 use warnings;
 use strict;
 
-use Net::Async::LastFM;
+use Mojo::LastFM;
 use Net::Discord;
 use Config::Tiny;
 use Mojo::IOLoop;
@@ -18,7 +18,7 @@ say localtime(time) . " - Loaded Config: $config_file";
 my $last_played = "";
 my $interval = $config->{'lastfm'}->{'interval'};
 
-my $lastfm = Net::Async::LastFM->new(
+my $lastfm = Mojo::LastFM->new(
     api_key     => $config->{'lastfm'}->{'api_key'}
 );
 
