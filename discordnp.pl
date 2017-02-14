@@ -5,7 +5,7 @@ use warnings;
 use strict;
 
 use Mojo::LastFM;
-use Net::Discord;
+use Mojo::Discord;
 use Config::Tiny;
 use Mojo::IOLoop;
 
@@ -22,7 +22,7 @@ my $lastfm = Mojo::LastFM->new(
     api_key     => $config->{'lastfm'}->{'api_key'}
 );
 
-my $discord = Net::Discord->new(
+my $discord = Mojo::Discord->new(
     # Ctrl+Shift+I and type localStorage.token in the console to get the user token.
     'token'         => $config->{'discord'}->{'token'},
     'token_type'    => 'Bearer',

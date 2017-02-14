@@ -74,7 +74,7 @@ Also install "cpanminus", an excellent tool for managing CPAN modules.
 
 Next, run `cpanminus --installdeps .` (the . is important) in the Discord-NP directory and it should automatically install everything you need, with the exception of my two other modules from here on Github, which you will have to install manually.
 
-- [Net::Discord](https://github.com/vsTerminus/Net-Discord) (For connecting to Discord)
+- [Mojo::Discord](https://github.com/vsTerminus/Net-Discord) (For connecting to Discord)
 - [Mojo::LastFM](https://github.com/vsTerminus/Net-Async-LastFM) (For a non-blocking connection to Last.FM)
 
 For me it was as simple as making symlinks to the Async and Net-Discord directories in ~/perl5/lib/perl5/Net/
@@ -95,7 +95,7 @@ In the Discord-NP directory, open a CMD window and run the  `cpanminus --install
 
 That should install all dependencies except for two, which you can get from my Github page and will need to install manually:
 
-- [Net::Discord](https://github.com/vsTerminus/Net-Discord) (For connecting to Discord)
+- [Mojo::Discord](https://github.com/vsTerminus/Net-Discord) (For connecting to Discord)
 - [Mojo::LastFM](https://github.com/vsTerminus/Net-Async-LastFM) (For a non-blocking connection to Last.FM)
 
 Take the "Net" folder out of each and drop it into `C:\Strawberry\perl\lib\` and choose Yes when it asks you if you would like to merge with the existing Net folder.
