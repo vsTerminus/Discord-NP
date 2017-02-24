@@ -18,13 +18,20 @@ say localtime(time) . " - Loaded Config: $config_file";
 my $last_played = "";
 my $interval = $config->{'lastfm'}->{'interval'};
 
+my $discord_token = $config->{'discord'}->{'token'};
+$discord_token =~ s/^(?:token:)?"?"?(.*?)"?"?$/$1/;  # Extract the actual token if they user copypasted the entire value from their browser.
+
+my $lastfm_key = $config->{'lastfm'}->{'api_key'};
+$lastfm_key =~ s/^"?(.*?)"?$/$1/;
+
 my $lastfm = Mojo::WebService::LastFM->new(
-    api_key     => $config->{'lastfm'}->{'api_key'}
+    api_key     => $lastfm_key
 );
+
 
 my $discord = Mojo::Discord->new(
     # Ctrl+Shift+I and type localStorage.token in the console to get the user token.
-    'token'         => $config->{'discord'}->{'token'},
+    'token'         => $discord_token,
     'token_type'    => 'Bearer',
     'name'          => 'Discord Now Playing',
     'url'           => 'https://github.com/vsterminus',
@@ -32,8 +39,7 @@ my $discord = Mojo::Discord->new(
     'verbose'       => $config->{'discord'}->{'verbose'},
     'reconnect'     => 1,
     'callbacks'     => {
-        'on_ready'  => \&on_ready,
-#        'on_finish' => \&on_finish,
+        'READY'  => \&on_ready,
     },
 );
 
