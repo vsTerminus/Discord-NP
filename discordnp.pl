@@ -94,13 +94,22 @@ sub on_ready
     say localtime(time) . " - Connected to Discord.";
 
     # Update status immediately
-    $discord->status_update({'game' => $np});
+    #$discord->status_update({'game' => $np});
+
+    $discord->status_update({
+        'name' => $np,
+        'type' => 2, # Listening to...
+        'details' => 'last.fm/user/' . $config->{'lastfm'}{'username'},
+        'state' => 'github.com/vsTerminus/Discord-NP'
+    });
+
     say localtime(time) . " - Status Updated: $np";
     $last_played = $np;
 
     # Once the status update has been sent, immediately disconnect from Discord again.
     # This ensures that we won't block Android notifications.
     # (If we stayed connected Discord would think we were actively watching the chat and would not trigger the push notification to mobile clients)
+    sleep(2);
     $discord->disconnect("Status Updated");
 }
 
