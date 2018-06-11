@@ -1,8 +1,8 @@
 # Discord Now Playing
 
-This script will update your Discord "Playing" status with whatever you are listening to according to Last.FM
+This script will update your Discord "Listening to" status with whatever you are listening to according to Last.FM
 
-![Discord Screenshot](https://i.imgur.com/1YLp0GV.png)
+![Discord Screenshot](https://i.imgur.com/Lhwg5Mq.png)
 
 Setup is fairly straightforward and only takes a few minutes. You'll need two things:
 
@@ -57,7 +57,7 @@ If it's working, it will look like this:
 
 ![Running Executable](https://i.imgur.com/AEmU5pi.png)
 
-**On the downside**: You will not see your own status. I'm sorry - there's nothing I can do about it. Discord does not send you your own status changes, so the Desktop App will never be aware that you have updated anything. Other users will see it, but you will not.
+~~**On the downside**: You will not see your own status.~~ **You will see your own status now!**
 
 
 
@@ -77,11 +77,11 @@ Next, run `cpanminus --installdeps .` (the . is important) in the Discord-NP dir
 - [Mojo::Discord](https://github.com/vsTerminus/Net-Discord) (For connecting to Discord)
 - [Mojo::WebService::LastFM](https://github.com/vsTerminus/Net-Async-LastFM) (For a non-blocking connection to Last.FM)
 
-For me it was as simple as making symlinks to the Async and Net-Discord directories in ~/perl5/lib/perl5/Net/
+For me it was as simple as making symlinks to the module directories in ~/perl5/lib/perl5/Net/
 
-    - ln -s /path/to/Net-Async-LastFM/lib/Net/Async ~/perl5/lib/perl5/Net/Async
-    - ln -s /path/to/Net-Discord/lib/Net/Discord ~/perl5/lib/perl5/Net/Discord
-    - ln -s /path/to/Net-Discord/lib/Net/Discord.pm ~/perl5/lib/perl5/Net/Discord.pm
+    - ln -s /path/to/Mojo-WebService-LastFM/lib/Mojo/WebService ~/perl5/lib/perl5/Mojo/WebService
+    - ln -s /path/to/Mojo-Discord/lib/Mojo/Discord ~/perl5/lib/perl5/Mojo/Discord
+    - ln -s /path/to/Mojo-Discord/lib/Mojo/Discord.pm ~/perl5/lib/perl5/Mojo/Discord.pm
 
 If you don't have a user lib you'll need to do this into your system perl lib directory as root instead.
 
@@ -95,9 +95,9 @@ In the Discord-NP directory, open a CMD window and run the  `cpanminus --install
 
 That should install all dependencies except for two, which you can get from my Github page and will need to install manually:
 
-- [Mojo::Discord](https://github.com/vsTerminus/Net-Discord) (For connecting to Discord)
-- [Mojo::WebService::LastFM](https://github.com/vsTerminus/Net-Async-LastFM) (For a non-blocking connection to Last.FM)
+- [Mojo::Discord](https://github.com/vsTerminus/Mojo-Discord) (For connecting to Discord)
+- [Mojo::WebService::LastFM](https://github.com/vsTerminus/Mojo-WebService-LastFM) (For a non-blocking connection to Last.FM)
 
-Take the "Net" folder out of each and drop it into `C:\Strawberry\perl\lib\` and choose Yes when it asks you if you would like to merge with the existing Net folder.
+Take the "Mojo" folder out of each and drop it into `C:\Strawberry\perl\lib\` and choose Yes when it asks you if you would like to merge with the existing Net folder.
 
 That's it! Have fun.
