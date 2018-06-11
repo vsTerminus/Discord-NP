@@ -91,11 +91,6 @@ sub on_ready
 {
     my ($hash) = @_;
 
-    say localtime(time) . " - Connected to Discord.";
-
-    # Update status immediately
-    #$discord->status_update({'game' => $np});
-
     $discord->status_update({
         'name' => $np,
         'type' => 2, # Listening to...
