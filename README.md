@@ -2,7 +2,7 @@
 
 This script will update your Discord "Listening to" status with whatever you are listening to according to Last.FM
 
-![Discord Screenshot](https://i.imgur.com/Lhwg5Mq.png)
+![Discord Screenshot](https://i.imgur.com/iOGZQl4.png)
 
 Setup is fairly straightforward and only takes a few minutes. You'll need two things:
 
