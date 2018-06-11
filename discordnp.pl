@@ -104,8 +104,9 @@ sub on_ready
     # Once the status update has been sent, immediately disconnect from Discord again.
     # This ensures that we won't block Android notifications.
     # (If we stayed connected Discord would think we were actively watching the chat and would not trigger the push notification to mobile clients)
-    sleep(2);
-    $discord->disconnect("Status Updated");
+     
+   
+    $discord->disconnect();
 }
 
 # This triggers when Discord disconnects.
