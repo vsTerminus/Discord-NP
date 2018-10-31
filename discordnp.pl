@@ -52,16 +52,19 @@ my $discord = Mojo::Discord->new(
 # Poll Last.FM and update the user's Discord status if the track has changed.
 sub update_status
 {
+    my $update = shift;
+
     # Mojo::WebService::LastFM lets us optionally specify a format to return the results in.
     # Without it we would just get a hashref back containing all of the values.
     # For this script all we need is Artist - Title.
-    # 
+    #
     # This call is also optionally non-blocking if a callback function is provided, which we are doing.
-    $lastfm->nowplaying({   user     => $config->{'lastfm'}->{'username'}, 
-                            format   => "%artist% - %title%", 
-                            callback => sub 
+    $lastfm->nowplaying({   user     => $config->{'lastfm'}->{'username'},
+        #                            format   => "%artist% - %title%",
+                            callback => sub
     {
-        my $nowplaying = shift;
+        my $lastfm = shift;
+        my $nowplaying = $lastfm->{'artist'} . ' - ' . $lastfm->{'title'};
 
         if ( defined $nowplaying )
         {
@@ -71,42 +74,32 @@ sub update_status
                 $np = $nowplaying;
 
                 # Now connect to discord. Receiving the READY packet from Discord will trigger the status update automatically.
-                $discord->init(); 
+                $discord->status_update({
+                  'name' => $lastfm->{'artist'},
+                  'type' => 2, # Listening to... $np
+                  #        'details' => 'last.fm/user/' . $config->{'lastfm'}{'username'},
+                  'details' => $np,
+                  #                  'state' => 'github.com/vsTerminus/Discord-NP'
+                  'state' => $lastfm->{'album'}
+                });
+
+                say localtime(time) . " - Status Updated: $np";
+                $last_played = $np;
             }
         }
         else
         {
             say localtime(time) . " - Unable to retrieve Last.FM data.";
-        }    
+        }
     }});
-
-    
-
 }
 
-# After connecting to Discord it will send a READY packet full of information.
-# We don't care what is in that packet, only that Discord accepted our connection.
 # It tells us that it is now safe to send a status update.
 sub on_ready
 {
     my ($hash) = @_;
 
-    $discord->status_update({
-        'name' => $np,
-        'type' => 2, # Listening to...
-        'details' => 'last.fm/user/' . $config->{'lastfm'}{'username'},
-        'state' => 'github.com/vsTerminus/Discord-NP'
-    });
-
-    say localtime(time) . " - Status Updated: $np";
-    $last_played = $np;
-
-    # Once the status update has been sent, immediately disconnect from Discord again.
-    # This ensures that we won't block Android notifications.
-    # (If we stayed connected Discord would think we were actively watching the chat and would not trigger the push notification to mobile clients)
-     
-   
-    $discord->disconnect();
+    update_status();
 }
 
 # This triggers when Discord disconnects.
@@ -118,7 +111,7 @@ sub on_finish
 
 # This is the first line of code executed by the script (aside from setting variables).
 # It should trigger the first poll to Last.FM immediately.
-update_status();
+$discord->init();
 
 # Now set up a recurring timer to periodically poll Last.FM for new updates.
 Mojo::IOLoop->recurring($config->{'lastfm'}->{'interval'} => sub { update_status(); });
