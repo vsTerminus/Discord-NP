@@ -10,3 +10,4 @@ requires 'Mojo::JSON';
 requires 'Compress::Zlib';
 requires 'Encode::Guess';
 requires 'Config::Tiny';
+requires 'JSON::MaybeXS';
