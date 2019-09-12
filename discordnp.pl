@@ -34,20 +34,25 @@ my $lastfm = Mojo::WebService::LastFM->new(
 );
 
 # Set up the Mojo::Discord object with the provided token
-my $discord = Mojo::Discord->new(
-    # Ctrl+Shift+I and type localStorage.token in the console to get the user token.
-    'token'         => $discord_token,
-    'token_type'    => 'Bearer',
-    'name'          => 'Discord Now Playing',
-    'url'           => 'https://github.com/vsterminus',
-    'version'       => '1.0',
-    'verbose'       => $config->{'discord'}->{'verbose'},
-    'reconnect'     => 0,
-    'callbacks'     => {    # We really only need to know when Discord is connected and disconnected. Nothing else matters here.
-        'READY'     => \&on_ready,
-        'FINISH'    => \&on_finish, 
-    },
-);
+my $discord = new_discord();
+
+sub new_discord {
+    my $self = shift;
+
+    return Mojo::Discord->new(
+        'token'         => $discord_token,
+        'token_type'    => 'Bearer',
+        'name'          => 'Discord Now Playing',
+        'url'           => 'https://github.com/vsterminus',
+        'version'       => '1.0',
+        'verbose'       => $config->{'discord'}->{'verbose'},
+        'reconnect'     => 1,
+        'callbacks'     => {    # We really only need to know when Discord is connected and disconnected. Nothing else matters here.
+            'READY'     => \&on_ready,
+            'FINISH'    => \&on_finish, 
+        },
+    );
+  }
 
 # Poll Last.FM and update the user's Discord status if the track has changed.
 sub update_status
@@ -59,39 +64,37 @@ sub update_status
     # For this script all we need is Artist - Title.
     #
     # This call is also optionally non-blocking if a callback function is provided, which we are doing.
-    $lastfm->nowplaying({   user     => $config->{'lastfm'}->{'username'},
-        #                            format   => "%artist% - %title%",
-                            callback => sub
-    {
-        my $lastfm = shift;
-        my $nowplaying = $lastfm->{'artist'} . ' - ' . $lastfm->{'title'};
-
-        if ( defined $nowplaying )
+    $lastfm->nowplaying
+    ({   
+        user     => $config->{'lastfm'}->{'username'},
+        callback => sub
         {
-            if ( $nowplaying ne $last_played )
-            {
-                # If we received a valid response from Last.FM and a new song is playing, update our info.
-                $np = $nowplaying;
+            my $lastfm = shift;
+            my $nowplaying = $lastfm->{'artist'} . ' - ' . $lastfm->{'title'};
 
+            # Only update if the song is currently playing
+            # We can identify that by $lastfm->{'date'} being undefined.
+            if ( defined $nowplaying and !defined $lastfm->{'date'} )
+            {
                 # Now connect to discord. Receiving the READY packet from Discord will trigger the status update automatically.
                 $discord->status_update({
                   'name' => $lastfm->{'artist'},
                   'type' => 2, # Listening to... $np
-                  #        'details' => 'last.fm/user/' . $config->{'lastfm'}{'username'},
-                  'details' => $np,
-                  #                  'state' => 'github.com/vsTerminus/Discord-NP'
+                  'details' => $nowplaying,
                   'state' => $lastfm->{'album'}
                 });
 
-                say localtime(time) . " - Status Updated: $np";
-                $last_played = $np;
+                say localtime(time) . " - Status Updated: $nowplaying";
+                $last_played = $nowplaying;
             }
+            else
+            {
+                say localtime(time) . " - Unable to retrieve Last.FM data.";
+            }
+            # Disconnect from Discord
+            $discord->disconnect();
         }
-        else
-        {
-            say localtime(time) . " - Unable to retrieve Last.FM data.";
-        }
-    }});
+    });
 }
 
 # It tells us that it is now safe to send a status update.
@@ -107,6 +110,10 @@ sub on_ready
 sub on_finish
 {
     say localtime(time) . " - Disconnected from Discord.";
+    #undef $discord;
+    sleep($config->{'lastfm'}->{'interval'});
+    #$discord = new_discord();
+    $discord->init();
 }
 
 # This is the first line of code executed by the script (aside from setting variables).
