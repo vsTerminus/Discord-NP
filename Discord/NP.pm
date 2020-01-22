@@ -13,38 +13,30 @@ use namespace::clean;
 # Default to "config.ini" unless one is passed in as an argument
 has 'interval'      => ( is => 'rw', default => 60 );
 has 'discord_token' => ( is => 'ro' );
-has 'discord'       => ( is => 'rwp' );
+has 'discord'       => ( is => 'lazy', builder => sub {
+    my $self = shift;
+     Mojo::Discord->new(
+        'token'         => $self->discord_token,
+        'token_type'    => 'Bearer',
+        'name'          => 'Discord Now Playing',
+        'url'           => 'https://github.com/vsterminus',
+        'version'       => '1.0',
+        'logdir'        => $self->logdir,
+        'loglevel'      => $self->loglevel,
+        'reconnect'     => 1,
+        'callbacks'     => {
+            'READY'     => sub { $self->on_ready(@_) },
+            'FINISH'    => sub { $self->on_finish(@_) },
+            'PRESENCE_UPDATE'   => sub { $self->on_presence_update(@_) },
+        },
+    )
+});
 has 'logdir'        => ( is => 'ro' );
 has 'loglevel'      => ( is => 'ro' );
 has 'lastfm_user'   => ( is => 'ro' );
 has 'lastfm_key'    => ( is => 'ro' );
-has 'lastfm'        => ( is => 'rwp' );
+has 'lastfm'        => ( is => 'lazy', builder => sub { Mojo::WebService::LastFM->new( api_key => shift->lastfm_key ) } );
 has 'my_id'         => ( is => 'rw' );
-
-sub BUILD
-{
-    my $self = shift;
-
-    $self->_set_lastfm(  Mojo::WebService::LastFM->new( api_key => $self->lastfm_key ) );
-
-    $self->_set_discord(
-        Mojo::Discord->new(
-            'token'         => $self->discord_token,
-            'token_type'    => 'Bearer',
-            'name'          => 'Discord Now Playing',
-            'url'           => 'https://github.com/vsterminus',
-            'version'       => '1.0',
-            'logdir'        => $self->logdir,
-            'loglevel'      => $self->loglevel,
-            'reconnect'     => 1,
-            'callbacks'     => {
-                'READY'     => sub { $self->on_ready(@_) },
-                'FINISH'    => sub { $self->on_finish(@_) },
-                'PRESENCE_UPDATE'   => sub { $self->on_presence_update(@_) },
-            },
-        )
-    );
-}
 
 # Poll Last.FM and update the user's Discord status if the track has changed.
 sub update_status
