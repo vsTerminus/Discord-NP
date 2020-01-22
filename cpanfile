@@ -5,8 +5,5 @@
 # requires 'Mojo::WebService::LastFM';
 
 requires 'Mojo::IOLoop';
-requires 'Mojo::UserAgent';
-requires 'Mojo::JSON';
-requires 'Compress::Zlib';
-requires 'Encode::Guess';
 requires 'Config::Tiny';
+requires 'Data::Dumper';
