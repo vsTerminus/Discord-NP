@@ -23,8 +23,9 @@ interval = 30
 # That's it!
 token = xxx
 
-# If you want more information from Discord displayed on the screen, enable this.
-# It will show all of the messages being sent and received from the server. Useful for debugging.
-# 1 = on, 0 = off
-verbose = 0
+# Logging - This script will record a log of events to disk.
+# log_dir should be set to a folder you have access to. Do not add a trailing slash.
+# log_level can be one of: debug, info, warn, error, fatal
+log_dir=/path/to/log/discord-np
+log_level=info
 

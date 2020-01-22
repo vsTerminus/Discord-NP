@@ -1,128 +1,33 @@
 #!/usr/bin/env perl
 
-use Mojo::Base -base;
-use Mojo::WebService::LastFM;
-use Mojo::Discord;
-use Mojo::IOLoop;
-use Config::Tiny;
+use v5.10;
+use strict;
+use warnings;
 
-# Read the config file
-# Default to "config.ini" unless one is passed in as an argument
+use Config::Tiny;
+use Discord::NP;
+
+# This file is responsible for reading the config, creating the Discord::NP object, and calling init().
+
 my $config = Config::Tiny->new;
 my $config_file = $ARGV[0] // 'config.ini';
+
 $config = Config::Tiny->read( $config_file, 'utf8' );
-say localtime(time) . " - Loaded Config: $config_file";
+say localtime(time) . " - Loaded Config: " . $config_file;
 
-# Instantiate the current and previously played tracks to empty strings
-my $np = "";
-my $last_played = "";
-
-# How often are we polling Last.FM for new statuses?
-my $interval = $config->{'lastfm'}->{'interval'};
-
-# Get the user's Discord token from the config
-my $discord_token = $config->{'discord'}->{'token'};
+my $discord_token = $config->{'discord'}{'token'};
 $discord_token =~ s/^(?:token:)?"?"?(.*?)"?"?$/$1/;  # Extract the actual token if they user copypasted the entire field from their browser.
 
-# Get the user's Last.FM API Key from the config
-my $lastfm_key = $config->{'lastfm'}->{'api_key'};
+my $lastfm_key = $config->{'lastfm'}{'api_key'};
 $lastfm_key =~ s/^"?(.*?)"?$/$1/;
 
-# Set up the Mojo::WebService::LastFM object with the provided key
-my $lastfm = Mojo::WebService::LastFM->new(
-    api_key     => $lastfm_key
+my $np = Discord::NP->new(
+    'interval'          => $config->{'lastfm'}{'interval'},
+    'lastfm_user'       => $config->{'lastfm'}{'username'},
+    'lastfm_key'        => $lastfm_key,
+    'discord_token'     => $discord_token,
+    'logdir'            => $config->{'discord'}{'log_dir'},
+    'loglevel'          => $config->{'discord'}{'log_level'},
 );
 
-# Set up the Mojo::Discord object with the provided token
-my $discord = new_discord();
-
-sub new_discord {
-    my $self = shift;
-
-    return Mojo::Discord->new(
-        'token'         => $discord_token,
-        'token_type'    => 'Bearer',
-        'name'          => 'Discord Now Playing',
-        'url'           => 'https://github.com/vsterminus',
-        'version'       => '1.0',
-        'verbose'       => $config->{'discord'}->{'verbose'},
-        'reconnect'     => 1,
-        'callbacks'     => {    # We really only need to know when Discord is connected and disconnected. Nothing else matters here.
-            'READY'     => \&on_ready,
-            'FINISH'    => \&on_finish, 
-        },
-    );
-  }
-
-# Poll Last.FM and update the user's Discord status if the track has changed.
-sub update_status
-{
-    my $update = shift;
-
-    # Mojo::WebService::LastFM lets us optionally specify a format to return the results in.
-    # Without it we would just get a hashref back containing all of the values.
-    # For this script all we need is Artist - Title.
-    #
-    # This call is also optionally non-blocking if a callback function is provided, which we are doing.
-    $lastfm->nowplaying
-    ({   
-        user     => $config->{'lastfm'}->{'username'},
-        callback => sub
-        {
-            my $lastfm = shift;
-            my $nowplaying = $lastfm->{'artist'} . ' - ' . $lastfm->{'title'};
-
-            # Only update if the song is currently playing
-            # We can identify that by $lastfm->{'date'} being undefined.
-            if ( defined $nowplaying and !defined $lastfm->{'date'} )
-            {
-                # Now connect to discord. Receiving the READY packet from Discord will trigger the status update automatically.
-                $discord->status_update({
-                  'name' => $lastfm->{'artist'},
-                  'type' => 2, # Listening to... $np
-                  'details' => $nowplaying,
-                  'state' => $lastfm->{'album'}
-                });
-
-                say localtime(time) . " - Status Updated: $nowplaying";
-                $last_played = $nowplaying;
-            }
-            else
-            {
-                say localtime(time) . " - Unable to retrieve Last.FM data.";
-            }
-            # Disconnect from Discord
-            $discord->disconnect();
-        }
-    });
-}
-
-# It tells us that it is now safe to send a status update.
-sub on_ready
-{
-    my ($hash) = @_;
-
-    update_status();
-}
-
-# This triggers when Discord disconnects.
-# We could do more validation here, but for now this is enough.
-sub on_finish
-{
-    say localtime(time) . " - Disconnected from Discord.";
-    #undef $discord;
-    sleep($config->{'lastfm'}->{'interval'});
-    #$discord = new_discord();
-    $discord->init();
-}
-
-# This is the first line of code executed by the script (aside from setting variables).
-# It should trigger the first poll to Last.FM immediately.
-$discord->init();
-
-# Now set up a recurring timer to periodically poll Last.FM for new updates.
-Mojo::IOLoop->recurring($config->{'lastfm'}->{'interval'} => sub { update_status(); });
-
-# Start the IOLoop. This will connect to discord and begin the LastFM timers.
-# Anything below this line will not execute until the IOLoop completes (which is never).
-Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+$np->init();
