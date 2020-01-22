@@ -15,7 +15,7 @@ has 'interval'      => ( is => 'rw', default => 60 );
 has 'discord_token' => ( is => 'ro' );
 has 'discord'       => ( is => 'lazy', builder => sub {
     my $self = shift;
-     Mojo::Discord->new(
+    my $discord = Mojo::Discord->new(
         'token'         => $self->discord_token,
         'token_type'    => 'Bearer',
         'name'          => 'Discord Now Playing',
@@ -24,12 +24,7 @@ has 'discord'       => ( is => 'lazy', builder => sub {
         'logdir'        => $self->logdir,
         'loglevel'      => $self->loglevel,
         'reconnect'     => 1,
-        'callbacks'     => {
-            'READY'     => sub { $self->on_ready(@_) },
-            'FINISH'    => sub { $self->on_finish(@_) },
-            'PRESENCE_UPDATE'   => sub { $self->on_presence_update(@_) },
-        },
-    )
+    );
 });
 has 'logdir'        => ( is => 'ro' );
 has 'loglevel'      => ( is => 'ro' );
@@ -38,7 +33,7 @@ has 'lastfm_key'    => ( is => 'ro' );
 has 'lastfm'        => ( is => 'lazy', builder => sub { Mojo::WebService::LastFM->new( api_key => shift->lastfm_key ) } );
 has 'my_id'         => ( is => 'rw' );
 
-# Poll Last.FM and update the user's Discord status if the track has changed.
+# Poll Last.FM and update the user's Discord status
 sub update_status
 {
     my ($self, $update) = @_;
@@ -77,57 +72,35 @@ sub update_status
     });
 }
 
-# It tells us that it is now safe to send a status update.
-sub on_ready
-{
-    my ($self, $hash) = @_;
-
-    $self->add_me($hash->{'user'});
-
-    $self->update_status();
-}
-
 sub add_me
 {
     my ($self, $user) = @_;
-    say "Adding my ID as " . $user->{'id'};
     $self->my_id($user->{'id'});
-}
-
-sub on_finish
-{
-    my ($self) = @_;
-
-    say localtime(time) . " - Disconnected from Discord.";
-}
-
-sub on_presence_update
-{
-    my ($self, $hash) = @_;
-
-    if ( exists $hash->{'user'}{'id'} )
-    {
-        if ( $self->my_id == $hash->{'user'}{'id'} )
-        {
-            say " - Presence update";
-            say Data::Dumper->Dump([$hash], ['hash']);
-        }
-    }
 }
 
 sub init
 {
     my $self = shift;
 
-    # This is the first line of code executed by the script (aside from setting variables).
-    # It should trigger the first poll to Last.FM immediately.
-    $self->discord->init();
+    $self->discord->gw->on('READY' => sub 
+    {
+        my ($gw, $hash) = @_;
+        say localtime(time) . " - Connected to Discord";
+        $self->add_me($hash->{'user'});
+        $self->update_status();
+    });
 
-    # Now set up a recurring timer to periodically poll Last.FM for new updates.
+    $self->discord->gw->on('FINISH', => sub {
+        say localtime(time) . " - Disconnected from Discord";
+    });
+   
+    # Connect to Discord
+    $self->discord->init();
+    
+    # Update status on a recurring timer
     Mojo::IOLoop->recurring($self->interval => sub { $self->update_status(); });
 
-    # Start the IOLoop. This will connect to discord and begin the LastFM timers.
-    # Anything below this line will not execute until the IOLoop completes (which is never).
+    # Start IOLoop - Nothing below this line will execute until the loop ends (never).
     Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 }
 
