@@ -32,6 +32,7 @@ has 'lastfm_user'   => ( is => 'ro' );
 has 'lastfm_key'    => ( is => 'ro' );
 has 'lastfm'        => ( is => 'lazy', builder => sub { Mojo::WebService::LastFM->new( api_key => shift->lastfm_key ) } );
 has 'my_id'         => ( is => 'rw' );
+has 'last_status'   => ( is => 'rw' );
 
 # Poll Last.FM and update the user's Discord status
 sub update_status
@@ -56,17 +57,27 @@ sub update_status
             {
                 # Now connect to discord. Receiving the READY packet from Discord will trigger the status update automatically.
                 $self->discord->status_update({
-                  'name' => $json->{'artist'},
-                  'type' => 2, # Listening to... $np
-                  'details' => $nowplaying,
-                  'state' => $json->{'album'}
+                    'name' => $json->{'artist'},
+                    'type' => 2, # Listening to... $np
+                    'details' => $nowplaying,
+                    'state' => $json->{'album'}
                 });
 
-                say localtime(time) . " - Status Updated: $nowplaying";
+                say localtime(time) . " - Now Playing: $nowplaying";
+                $self->last_status($nowplaying);
             }
             else
             {
-                say localtime(time) . " - Unable to retrieve Last.FM data.";
+                if ( defined $self->last_status )
+                {
+                    $self->discord->status_update({
+                        'name'  => 'Nothing',
+                        'type'  => 2
+                    });
+
+                    say localtime(time) . " - Nothing is currently playing.";
+                    $self->last_status(undef);
+                }
             }
         }
     });
