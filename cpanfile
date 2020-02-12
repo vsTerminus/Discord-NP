@@ -4,6 +4,9 @@
 # requires 'Mojo::Discord';
 # requires 'Mojo::WebService::LastFM';
 
-requires 'Mojo::IOLoop';
-requires 'Config::Tiny';
-requires 'Data::Dumper';
+requires 'Moo';                 # OO Framework
+requires 'strictures~2';        # Enables strict and warnings with specific settings
+requires 'Mojo::IOLoop';        # Simple event loop for persistent websocket connection
+requires 'Config::Tiny';        # For reading config.ini
+requires 'Data::Dumper';        # For debugging complex objects
+requires 'namespace::clean';    # Removes declared and imported symbols from your compiled package
