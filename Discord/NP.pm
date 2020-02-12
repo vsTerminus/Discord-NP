@@ -1,5 +1,6 @@
 package Discord::NP;
 use feature 'say';
+binmode(STDOUT, ":utf8");
 
 use Moo;
 use strictures 2;
