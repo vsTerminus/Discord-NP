@@ -2,9 +2,9 @@
 
 This script will update your Discord "Listening to" status with whatever you are listening to according to Last.FM
 
-![Discord Screenshot](https://i.imgur.com/iOGZQl4.png)
+![Discord Screenshot](/img/sidebar-big.png)
 
-Setup is fairly straightforward and only takes a few minutes. You'll need two things:
+Setup will take a few minutes and requires two main things:
 
 ## **1. Last.FM API Key**
 
@@ -12,11 +12,11 @@ Head over to the [Last.FM API Page](https://www.last.fm/api/account/create) and 
 
 It doesn't really matter what you put in most of the fields, but it should probably look something like this:
 
-![LastFM Create API Account Screenshot](https://i.imgur.com/wAWUExr.png)
+![LastFM Create API Account Screenshot](/img/create-account.png)
 
 After clicking Submit you should get a confirmation page with two items: *API Key* and *Shared Secret*. The API Key is the only one you need for this, but I recommend you save both for future use just in case, as they don't actually provide a way to retrieve these later.
 
-![LastFM API Account Created Screenshot](https://i.imgur.com/L02mC9D.png)
+![LastFM API Account Created Screenshot](/img/account-created.png)
 
 Copy and paste the API Key value into the config file in the `api_key = xxx` line
 
@@ -24,41 +24,22 @@ Copy and paste the API Key value into the config file in the `api_key = xxx` lin
 
 For this one you'll need to use the Desktop or Web app - it will not work on mobile.
 
-If you are using the desktop app:
+WARNING: Anyone who knows your Discord token has **FULL ACCESS** to your account. Do not share it with anyone!
+You *should* read this application's source code for yourself and make sure you trust it before inputting your token.
 
-- Press **Ctrl+Shift+I**
-- Click the "*Application*" tab
-- Click and expand the "*Local Storage*" section
-- Click on the only entry in this section, "*https://discordapp.com*"
-- Right click -> Edit Value in the field to the right of "*token*"
-- Copy and paste the token value into the config file on the `token = xxx` line and remove the quotation marks from it.
-
-![Desktop Token](https://i.imgur.com/gvcsUTD.png)
-
-If you are using Discord in a browser:
-
-- Press **F12**
-- Click the "*Storage*" tab
-- Click and expand the "*Local Storage*" section
-- Click on the only entry, "*https://discordapp.com*"
-- Copy the value beside the "*token*" entry and paste it into your config file without the quotation marks.
-
-![Browser Token](https://i.imgur.com/RHjJNyO.png)
+If you still want to proceed, head over to https://discordhelp.net/discord-token and follow the instructions there. 
 
 ## When you're done
 
 Save your config file as "*config.ini*" and it should look something like this:
 
-![Finished Config File](https://i.imgur.com/lMiIx9N.png)
+![Finished Config File](/img/config.png)
 
 Now just run the executable. It should connect to Discord and immediately start setting your "*Playing*" status to whatever you're listening to on Last.FM
 
-If it's working, it will look like this:
+If it's working, it will look something like this:
 
-![Running Executable](https://i.imgur.com/AEmU5pi.png)
-
-~~**On the downside**: You will not see your own status.~~ **You will see your own status now!**
-
+![Running Executable](/img/running.png)
 
 
 
@@ -66,9 +47,10 @@ If it's working, it will look like this:
 
 If you want to contribute to the code or just prefer to run the raw perl script instead of my packaged executable, you can do that too.
 
-### Linux
+### Linux, MacOS
 
 You should already have Perl. If you don't, you need at least v5.10 -- Install it with your package manager.
+On MacOS I recommend installing perl from Homebrew instead of system perl. It's probably not necessary for this particular project, but I recommend it in general.
 
 Also install "cpanminus", an excellent tool for managing CPAN modules.
 
