@@ -33,6 +33,8 @@ has 'lastfm_key'    => ( is => 'ro' );
 has 'lastfm'        => ( is => 'lazy', builder => sub { Mojo::WebService::LastFM->new( api_key => shift->lastfm_key ) } );
 has 'my_id'         => ( is => 'rw' );
 has 'last_status'   => ( is => 'rw' );
+has 'show_artist'   => ( is => 'ro' );
+has 'show_title'    => ( is => 'ro' );
 
 # Poll Last.FM and update the user's Discord status
 sub update_status
@@ -50,6 +52,11 @@ sub update_status
         callback => sub { 
             my $json = shift;
             my $nowplaying = $json->{'artist'} . ' - ' . $json->{'title'};
+            
+            my $sidebar = "Music";
+            if ( $self->show_artist and $self->show_title ) { $sidebar = $nowplaying }
+            elsif ( $self->show_artist ) { $sidebar = $json->{'artist'} }
+            elsif ( $self->show_title )  { $sidebar = $json->{'title'} }
 
             # Only update if the song is currently playing
             # We can identify that by $lastfm->{'date'} being undefined.
@@ -57,7 +64,7 @@ sub update_status
             {
                 # Now connect to discord. Receiving the READY packet from Discord will trigger the status update automatically.
                 $self->discord->status_update({
-                    'name' => $json->{'artist'},
+                    'name' => $sidebar,
                     'type' => 2, # Listening to... $np
                     'details' => $nowplaying,
                     'state' => $json->{'album'}

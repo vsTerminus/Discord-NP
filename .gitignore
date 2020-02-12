@@ -1,0 +1,8 @@
+# Ignore the build dir if you compile this into a packaged executable
+build/
+
+# Ignore your personal config file
+config.ini
+
+# Ignore all log files
+*.log

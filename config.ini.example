@@ -7,25 +7,37 @@
 # This script only requires the api key.
 api_key = xxx
 
-# Next, you'll also need to provide your Last.FM username for the script to query.
+# You'll also need to provide your Last.FM username for the script to query.
 username = xxx
 
-# Finally, provide an interval (in seconds). This tells the script how often it should
+# Provide an interval (in seconds). This tells the script how often it should
 # check what you're listening to.
-interval = 30
+interval = 60
+
+# These next two determine what shows up in the sidebar under your name where it says "Listening to ..."
+# Yes to both: "artist - title" (eg "Devin Townsend - Genesis")
+# Yes to artist only: "artist" (eg "Devin Townsend")
+# Yes to title only: "title" (eg "Genesis")
+# No to both: "Music"
+# In any case, clicking on your name will show Artist, Title, and Album info in the popup.
+show_artist = yes
+show_title = yes
 
 [discord]
-# Unlike Last.FM, you don't need an API account for the Discord connection.
-# All you need is your User Token from the Discord Desktop (or web) Application.
-# To get it, open Discord and press "Ctrl+Shift+I", then go to the console tab.
-# Enter "localStorage.token" (without the quotes) and hit enter. Your User Token should be printed on the screen for you.
-# Copy it and paste it in here.
-# That's it!
+# You need your discord user token so the script can log in as you and set your status.
+#
+# DISCLAIMER:
+# YOU SHOULD CONSIDER THIS CAREFULLY. The discord token is like your password. Take care not to share it with anyone!
+# You should absolutely look at the source code for yourself before you entrust any application (even this one!) with your token.
+#
+# If you still wish to proceed, learn how to get your token from here: https://discordhelp.net/discord-token
+# It should look something like this (but longer): Mzk1MjY1.DgAknw.IiTvP8eSNRD 
 token = xxx
 
 # Logging - This script will record a log of events to disk.
 # log_dir should be set to a folder you have access to. Do not add a trailing slash.
-# log_level can be one of: debug, info, warn, error, fatal
-log_dir=/path/to/log/discord-np
-log_level=info
+# log_level can be one of: debug, info, warn, error, fatal, none
+# Default value logs only warnings and fatal errors, and defaults to the same folder the script is in.
+log_dir=.
+log_level=fatal
 
