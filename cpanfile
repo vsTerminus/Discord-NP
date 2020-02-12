@@ -4,7 +4,7 @@
 # You'll have to get it from my github and install them yourself into your perl lib folder.
 
 requires 'Moo';                         # OO Framework
-requires 'strictures~2';                # Enables strict and warnings with specific settings
+requires 'strictures', '2';                # Enables strict and warnings with specific settings
 requires 'Mojo::Discord';               # Discord conneciton library
 requires 'Mojo::WebService::LastFM';    # LastFM API library
 requires 'Mojo::IOLoop';                # Simple event loop for persistent websocket connection
