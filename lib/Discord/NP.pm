@@ -47,45 +47,42 @@ sub update_status
     # For this script all we need is Artist - Title.
     #
     # This call is also optionally non-blocking if a callback function is provided, which we are doing.
-    $self->lastfm->nowplaying(
+    $self->lastfm->nowplaying({user => $self->lastfm_user}, sub
     {   
-        user     => $self->lastfm_user,
-        callback => sub { 
-            my $json = shift;
-            my $nowplaying = $json->{'artist'} . ' - ' . $json->{'title'};
-            
-            my $sidebar = "Music";
-            if ( $self->show_artist and $self->show_title ) { $sidebar = $nowplaying }
-            elsif ( $self->show_artist ) { $sidebar = $json->{'artist'} }
-            elsif ( $self->show_title )  { $sidebar = $json->{'title'} }
+        my $json = shift;
+        my $nowplaying = $json->{'artist'} . ' - ' . $json->{'title'};
+        
+        my $sidebar = "Music";
+        if ( $self->show_artist and $self->show_title ) { $sidebar = $nowplaying }
+        elsif ( $self->show_artist ) { $sidebar = $json->{'artist'} }
+        elsif ( $self->show_title )  { $sidebar = $json->{'title'} }
 
-            # Only update if the song is currently playing
-            # We can identify that by $lastfm->{'date'} being undefined.
-            if ( defined $nowplaying and !defined $json->{'date'} )
+        # Only update if the song is currently playing
+        # We can identify that by $lastfm->{'date'} being undefined.
+        if ( defined $nowplaying and !defined $json->{'date'} )
+        {
+            # Now connect to discord. Receiving the READY packet from Discord will trigger the status update automatically.
+            $self->discord->status_update({
+                'name' => $sidebar,
+                'type' => 2, # Listening to... $np
+                'details' => $nowplaying,
+                'state' => $json->{'album'}
+            });
+
+            say localtime(time) . " - Now Playing: $nowplaying";
+            $self->last_status($nowplaying);
+        }
+        else
+        {
+            if ( defined $self->last_status )
             {
-                # Now connect to discord. Receiving the READY packet from Discord will trigger the status update automatically.
                 $self->discord->status_update({
-                    'name' => $sidebar,
-                    'type' => 2, # Listening to... $np
-                    'details' => $nowplaying,
-                    'state' => $json->{'album'}
+                    'name'  => 'Nothing',
+                    'type'  => 2
                 });
 
-                say localtime(time) . " - Now Playing: $nowplaying";
-                $self->last_status($nowplaying);
-            }
-            else
-            {
-                if ( defined $self->last_status )
-                {
-                    $self->discord->status_update({
-                        'name'  => 'Nothing',
-                        'type'  => 2
-                    });
-
-                    say localtime(time) . " - Nothing is currently playing.";
-                    $self->last_status(undef);
-                }
+                say localtime(time) . " - Nothing is currently playing.";
+                $self->last_status(undef);
             }
         }
     });
