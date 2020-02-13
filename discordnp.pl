@@ -4,6 +4,9 @@ use v5.10;
 use strict;
 use warnings;
 
+use FindBin 1.51 qw( $RealBin );
+use lib "$RealBin/lib";
+
 use Config::Tiny;
 use Discord::NP;
 
