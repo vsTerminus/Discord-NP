@@ -1,8 +1,5 @@
-# Ignore the compiled package
-build/discordnp-linux
-build/discordnp-cygwin
-build/discordnp-darwin
-build/discordnp-*.exe
+# Ignore the compiled package(s)
+build/discordnp-*
 
 # Ignore the build dependency cache
 build/depcache
