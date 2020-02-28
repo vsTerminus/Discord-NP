@@ -43,7 +43,7 @@ If it's working, it will look something like this:
 
 
 
-## Build from Source
+## Run from Source
 
 If you want to contribute to the code or just prefer to run the raw perl script instead of my packaged executable, you can do that too.
 
@@ -54,16 +54,40 @@ On MacOS I recommend installing perl from Homebrew instead of system perl. It's 
 
 Also install "cpanminus", an excellent tool for managing CPAN modules.
 
-Next, run `cpanminus --installdeps .` (the . is important) in the Discord-NP directory and it should automatically install everything you need, with the exception of my two other modules from here on Github, which you will have to install manually.
+Most of the dependencies can be installed automatically using `cpanm`, but there are two which are still manual installations until I can get them into CPAN.
+- [Mojo::Discord](https://github.com/vsTerminus/Mojo-Discord)
+- [Mojo::WebService::LastFM](https://github.com/vsTerminus/Mojo-WebService-LastFM)
 
-- [Mojo::Discord](https://github.com/vsTerminus/Net-Discord) (For connecting to Discord)
-- [Mojo::WebService::LastFM](https://github.com/vsTerminus/Net-Async-LastFM) (For a non-blocking connection to Last.FM)
+Once Perl and cpanminus are installed, these commands should get you going.
+Make sure your PERL5LIB env variable is set and valid.
 
-For me it was as simple as making symlinks to the module directories in ~/perl5/lib/perl5/Net/
+```bash
+# Check out the repositories
+git clone https://github.com/vsTerminus/Discord-NP.git
+git clone https://github.com/vsTerminus/Mojo-Discord.git
+git clone https://github.com/vsTerminus/Mojo-WebService-LastFM.git
 
-    - ln -s /path/to/Mojo-WebService-LastFM/lib/Mojo/WebService ~/perl5/lib/perl5/Mojo/WebService
-    - ln -s /path/to/Mojo-Discord/lib/Mojo/Discord ~/perl5/lib/perl5/Mojo/Discord
-    - ln -s /path/to/Mojo-Discord/lib/Mojo/Discord.pm ~/perl5/lib/perl5/Mojo/Discord.pm
+# Create folders if needed
+mkdir -p $PERL5LIB/Mojo/WebService
+
+# Install Mojo::Discord and Mojo::WebService::LastFM
+ln -s $PWD/Mojo-Discord/lib/Mojo/Discord.pm $PERL5LIB/Mojo/
+ln -s $PWD/Mojo-Discord/lib/Mojo/Discord $PERL5LIB/Mojo/
+ln -s $PWD/Mojo-WebService-LastFM/lib/Mojo/WebService/LastFM.pm $PERL5LIB/Mojo/WebService/LastFM.pm
+
+# Install dependencies
+cd Mojo-Discord
+cpanm --installdeps .
+cd ../Mojo-WebService-LastFM
+cpanm --installdeps .
+cd ../Discord-NP
+cpanm --installdeps .
+
+# Create your personal config file by copying the example file
+cp config.ini.example config.ini
+```
+
+At this point you should be able to fill out config.ini and then run `perl discordnp.pl`
 
 If you don't have a user lib you'll need to do this into your system perl lib directory as root instead.
 
@@ -71,15 +95,35 @@ If you don't have a user lib you'll need to do this into your system perl lib di
 
 I recommend installing [Strawberry Perl](http://strawberryperl.com/), as it comes with cpanminus already installed.
 
-From here, the instructions are very similar to Linux:
+You need to check out three of my repositories:
 
-In the Discord-NP directory, open a CMD window and run the  `cpanminus --installdeps .` command (Note the period, it is important. Some users have also reported that `cpanminus installdeps` without the -- and . works better for them.)
-
-That should install all dependencies except for two, which you can get from my Github page and will need to install manually:
-
+- [Discord::NP](https://github.com/vsTerminus/Discord-NP) (This one!)
 - [Mojo::Discord](https://github.com/vsTerminus/Mojo-Discord) (For connecting to Discord)
 - [Mojo::WebService::LastFM](https://github.com/vsTerminus/Mojo-WebService-LastFM) (For a non-blocking connection to Last.FM)
 
-Take the "Mojo" folder out of each and drop it into `C:\Strawberry\perl\lib\` and choose Yes when it asks you if you would like to merge with the existing Net folder.
+Clone each one using git
+
+```cmd
+git clone https://github.com/vsTerminus/Discord-NP.git
+git clone https://github.com/vsTerminus/Mojo-Discord.git
+git clone https://github.com/vsTerminus/Mojo-WebService-LastFM.git
+```
+
+Enter each folder and install the dependencies
+
+```cmd
+cd Mojo-Discord
+cpanm --installdeps .
+cd ../Mojo-WebService-LastFM
+cpanm --installdeps .
+cd ../Discord-NP
+cpanm --installdeps .
+```
+
+Next take the "Mojo" folder out of each of those three projects and drop it into `C:\Strawberry\perl\lib\` and choose Yes when it asks you if you would like to merge with the existing Net folder.
+
+Finally, make a copy of config.ini.example in the Discord-NP project folder and rename it to "config.ini". Fill it out as normal.
+
+To run it, `perl discordnp.pl`
 
 That's it! Have fun.
