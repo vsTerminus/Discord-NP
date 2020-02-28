@@ -7,13 +7,28 @@ use warnings;
 use FindBin 1.51 qw( $RealBin );
 use lib "$RealBin/lib";
 
+# For PAR::Packer so we can find the files we packed
+use File::Spec;
+BEGIN {
+    if(exists $ENV{PAR_TEMP}) {
+        my $dir = File::Spec->catfile($ENV{PAR_TEMP}, 'inc');
+        chdir $dir or die "chdir `$dir' failed: $!";
+    }
+}
+
+use Getopt::Long;
 use Config::Tiny;
 use Discord::NP;
+use Mojo::IOLoop;
 
 # This file is responsible for reading the config, creating the Discord::NP object, and calling init().
 
 my $config = Config::Tiny->new;
-my $config_file = $ARGV[0] // 'config.ini';
+my $config_file = "$RealBin/config.ini";
+my $kill_timer = 0;
+GetOptions ("config=s" => \$config_file,
+            "kill_timer:i" => \$kill_timer,
+) or die ("Error in command line args\n");
 
 $config = Config::Tiny->read( $config_file, 'utf8' );
 say localtime(time) . " - Loaded Config: " . $config_file;
@@ -37,5 +52,8 @@ my $np = Discord::NP->new(
     'show_artist'       => $show_artist,
     'show_title'        => $show_title,
 );
+
+# Used for PAR::Packer so it can run the application temporarily to gather dependencies.
+Mojo::IOLoop->timer($kill_timer => sub { $np->discord->disconnect; Mojo::IOLoop->stop; }) if $kill_timer > 0;
 
 $np->init();
