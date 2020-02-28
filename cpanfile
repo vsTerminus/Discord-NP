@@ -9,6 +9,7 @@ requires 'Mojo::Discord';               # Discord conneciton library
 requires 'Mojo::WebService::LastFM';    # LastFM API library
 requires 'Mojo::IOLoop';                # Simple event loop for persistent websocket connection
 requires 'Config::Tiny';                # For reading config.ini
+requires 'Getopt::Long';                # For passing parameters
 requires 'Data::Dumper';                # For debugging complex objects
 requires 'namespace::clean';            # Removes declared and imported symbols from your compiled package
 requires 'FindBin' => '1.51';           # Used to include libs in cwd
