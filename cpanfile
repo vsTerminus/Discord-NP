@@ -8,6 +8,7 @@ requires 'strictures', '>=2, <3';       # Enables strict and warnings with speci
 requires 'Mojo::Discord';               # Discord conneciton library
 requires 'Mojo::WebService::LastFM';    # LastFM API library
 requires 'Mojo::IOLoop';                # Simple event loop for persistent websocket connection
+requires 'Mojo::IOLoop::TLS';           # PAR doesn't pick this one up, but it's needed.
 requires 'Config::Tiny';                # For reading config.ini
 requires 'Getopt::Long';                # For passing parameters
 requires 'Data::Dumper';                # For debugging complex objects
