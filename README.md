@@ -127,3 +127,24 @@ Finally, make a copy of config.ini.example in the Discord-NP project folder and 
 To run it, `perl discordnp.pl`
 
 That's it! Have fun.
+
+## Build From Source
+
+### Linux, MacOS
+
+You will need PAR::Packer, which you can install with cpanminus: `cpanm PAR::Packer`
+
+Now enter the "build" directory and run the "build.sh" script: `sh build.sh`
+
+If you're on Linux the script should finish and you should see a file named "discordnp-linux-gnu".
+On Mac, the file will be "discordnp-darwin\*" where \* is the version number (eg "darwin19.0")
+
+To run the file, just execute it. 
+
+If your config.ini is in the same folder: `./discordnp-linux`
+
+If config.ini is somewhere else: `./discordnp-linux --config=/path/to/config.ini`
+
+### Windows
+
+Not yet supported.
