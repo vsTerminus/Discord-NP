@@ -12,3 +12,4 @@ requires 'Config::Tiny';                # For reading config.ini
 requires 'Data::Dumper';                # For debugging complex objects
 requires 'namespace::clean';            # Removes declared and imported symbols from your compiled package
 requires 'FindBin' => '1.51';           # Used to include libs in cwd
+requires 'File::Spec';                  # Used for finding included files when packaged with PAR
