@@ -1,5 +1,11 @@
-# Ignore the build dir if you compile this into a packaged executable
-build/
+# Ignore the compiled package
+build/discordnp-linux
+build/discordnp-cygwin
+build/discordnp-darwin
+build/discordnp-*.exe
+
+# Ignore the build dependency cache
+build/depcache
 
 # Ignore your personal config file
 config.ini
