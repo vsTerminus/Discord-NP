@@ -7,15 +7,6 @@ use warnings;
 use FindBin 1.51 qw( $RealBin );
 use lib "$RealBin/lib";
 
-# For PAR::Packer so we can find the files we packed
-use File::Spec;
-BEGIN {
-    if(exists $ENV{PAR_TEMP}) {
-        my $dir = File::Spec->catfile($ENV{PAR_TEMP}, 'inc');
-        chdir $dir or die "chdir `$dir' failed: $!";
-    }
-}
-
 use Getopt::Long;
 use Config::Tiny;
 use Discord::NP;
