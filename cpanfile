@@ -5,8 +5,6 @@
 
 requires 'Moo';                         # OO Framework
 requires 'strictures', '>=2, <3';       # Enables strict and warnings with specific settings
-requires 'Mojo::Discord';               # Discord conneciton library
-requires 'Mojo::WebService::LastFM';    # LastFM API library
 requires 'Mojo::IOLoop';                # Simple event loop for persistent websocket connection
 requires 'Config::Tiny';                # For reading config.ini
 requires 'Getopt::Long';                # For passing parameters
