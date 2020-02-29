@@ -34,8 +34,8 @@ pp \
     --cachedeps=depcache \
     --addfile="$ENTITIES_FILE;Mojo/resources/html_entities.txt" \
     --addfile="$COMMANDS_FILE;Mojolicious/Commands.pm" \
-    --addfile="$IOLOOP_CERTS;Mojo/IOLoop/certs/" \
-    --addfile="$IOLOOP_RESOURCES;Mojo/IOLoop/resources/" \
+    --addfile="$IOLOOP_CERTS;Mojo/IOLoop/certs" \
+    --addfile="$IOLOOP_RESOURCES;Mojo/IOLoop/resources" \
     --lib=$MOJO_DISCORD_LIB \
     --lib=$MOJO_WEBSERVICE_LASTFM_LIB \
     --lib=$DISCORD_NP_LIB \
