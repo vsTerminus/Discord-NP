@@ -47,7 +47,7 @@ sub update_status
     # For this script all we need is Artist - Title.
     #
     # This call is also optionally non-blocking if a callback function is provided, which we are doing.
-    $self->lastfm->nowplaying({user => $self->lastfm_user}, sub
+    $self->lastfm->nowplaying({username => $self->lastfm_user}, sub
     {   
         my $json = shift;
         my $nowplaying = $json->{'artist'} . ' - ' . $json->{'title'};
