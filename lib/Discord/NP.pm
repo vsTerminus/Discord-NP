@@ -46,8 +46,8 @@ sub update_status
     # Without it we would just get a hashref back containing all of the values.
     # For this script all we need is Artist - Title.
     #
-    # This call is also optionally non-blocking if a callback function is provided, which we are doing.
-    $self->lastfm->nowplaying({username => $self->lastfm_user}, sub
+    # This is a non-blocking call using Mojo::Promise.
+    $self->lastfm->nowplaying_p({ 'username' => $self->lastfm_user })->then(sub
     {   
         my $json = shift;
         my $nowplaying = $json->{'artist'} . ' - ' . $json->{'title'};
@@ -85,6 +85,9 @@ sub update_status
                 $self->last_status(undef);
             }
         }
+    })->catch(sub
+    {
+        say Dumper(shift);
     });
 }
 
