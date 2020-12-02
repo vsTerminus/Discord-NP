@@ -1,7 +1,7 @@
 # Make sure $PERL5LIB is defined and valid.
 
 # Point to a valid config file so the script can execute and PAR can collect dependencies.
-CONFIG_FILE=$(PWD)/../config.ini
+CONFIG_FILE=config.ini
 
 # Mojo requires html_entities and Commands.pm
 ENTITIES_FILE=$(PERL5LIB)/Mojo/resources/html_entities.txt
@@ -25,25 +25,22 @@ MOJO_DISCORD_LIB=$(PERL5LIB)/Mojo/Discord/lib
 # Kill timer tells discordnp.pl to stop executing after the specified number of seconds. We can use this for pp to gather dependencies.
 KILL_TIMER=5
 
-
+# File extension (Only used for Windows
+EXT=
 ifeq ($(OS),Windows_NT)
-	OSTYPE = windows	
+	OSTYPE=windows
+	EXT=.exe
 else
-    UNAME_S := $(shell uname -s)
+    UNAME_S:=$(shell uname -s)
     ifeq ($(UNAME_S),Linux)
-        OSTYPE = linux
+        OSTYPE=linux
     endif
     ifeq ($(UNAME_S),Darwin)
-        OSTYPE = macos
+        OSTYPE=macos
     endif
 endif
 
-
-
 default:
-	@mkdir -p Mojo/IOLoop Mojolicious
-#	@cp -r $(IOLOOP_RESOURCES) Mojo/IOLoop/
-#	@cp    $(IOLOOP_TLS_PM)    Mojo/IOLoop/
 	@echo "Building Discord-NP for $(OSTYPE)"
 	@pp \
 		--execute \
@@ -57,8 +54,6 @@ default:
 		--lib=$(DISCORD_NP_LIB) \
 		--module="Mojo::IOLoop::TLS" \
 		--unicode \
-		--output="discordnp-$(OSTYPE)" \
+		--output="discordnp-$(OSTYPE)$(EXT)" \
 		../discordnp.pl > /dev/null 2>&1
-	@echo "Wrote file: ./discordnp-$(OSTYPE)"
-	@rm $(PWD)/mojo-discord.log
-	@rm -rf $(PWD)/Mojo $(PWD)/Mojolicious
+	@echo "Wrote file: ./discordnp-$(OSTYPE)$(EXT)"
