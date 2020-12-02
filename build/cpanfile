@@ -1,0 +1,7 @@
+# These are only required for building with PAR.
+# To use: cpanm --installdeps .
+
+# If Archive::Zip fails on MacOS, install version 1.64
+# cpanm Archive::Zip@1.64
+
+requires 'pp';                      # PAR Packer command line tool for creating executable packages

@@ -7,10 +7,31 @@ use warnings;
 use FindBin 1.51 qw( $RealBin );
 use lib "$RealBin/lib";
 
+use File::Spec;
+
+my $print_par = 0; # Set to 1 to print the PAR directory for debugging packed executables
+BEGIN {
+    if( exists $ENV{PAR_TEMP} and defined $ENV{PAR_TEMP} ) 
+	{
+        # If this is a PAR packed executable, include the packed lib directory so we get packed libraries in our path.
+		my $par_lib = $ENV{PAR_TEMP} . '/inc/lib';
+		push @INC, "$par_lib";
+        
+        if ( $print_par )
+        {
+		    say Data::Dumper->Dump([$ENV{PAR_TEMP}], ['par_temp']);
+		    say Data::Dumper->Dump([$par_lib], ['par_lib']);
+        }
+    }
+}
+
 use Getopt::Long;
 use Config::Tiny;
 use Discord::NP;
 use Mojo::IOLoop;
+
+use IO::Socket::SSL;
+# use IO::Socket::SSL qw(debug99); # Debugging output for troubleshooting connections
 
 # This file is responsible for reading the config, creating the Discord::NP object, and calling init().
 
