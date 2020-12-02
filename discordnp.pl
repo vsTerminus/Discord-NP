@@ -31,7 +31,6 @@ use Config::Tiny;
 use Discord::NP;
 use Mojo::IOLoop;
 
-use IO::Socket::SSL;
 # use IO::Socket::SSL qw(debug99); # Debugging output for troubleshooting connections
 
 # This file is responsible for reading the config, creating the Discord::NP object, and calling init().

@@ -7,7 +7,6 @@ requires 'Moo';                         # OO Framework
 requires 'strictures', '>=2, <3';       # Enables strict and warnings with specific settings
 requires 'Mojo::IOLoop';                # Simple event loop for persistent websocket connection
 requires 'Mojo::IOLoop::TLS';           # PAR doesn't pick this up, but it's needed
-requires 'IO::Socket::SSL';             
 requires 'Config::Tiny';                # For reading config.ini
 requires 'Getopt::Long';                # For passing parameters
 requires 'Data::Dumper';                # For debugging complex objects
