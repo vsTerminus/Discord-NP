@@ -79,7 +79,11 @@ default:
 clean:
 	rm build/depcache
 	rm build/discordnp-*
+	rm build/mojo-discord.log
+	rm mojo-discord.log
 
 cleanwin:
 	del build\depcache
 	del build\discordnp-windows.exe
+	del build\mojo-discord.log
+	del mojo-discord.log
