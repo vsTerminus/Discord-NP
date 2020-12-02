@@ -1,5 +1,11 @@
 # Make sure $PERL5LIB is defined and valid.
 
+# Assumes default installation. Change as required.
+STRAWBERRY_BIN=C:\Strawberry\c\bin
+ZLIB=$(STRAWBERRY_BIN)\ZLIB1__.DLL
+LIBCRYPTO=$(STRAWBERRY_BIN)\LIBCRYPTO-1_1-X64__.DLL
+LIBSSL=$(STRAWBERRY_BIN)\LIBSSL-1_1-X64__.DLL
+
 # Point to a valid config file so the script can execute and PAR can collect dependencies.
 CONFIG_FILE=config.ini
 
@@ -22,14 +28,37 @@ DISCORD_NP_LIB=$(PERL5LIB)/Discord/NP/lib
 MOJO_WEBSERVICE_LASTFM_LIB=$(PERL5LIB)/Mojo/WebService/LastFM/lib
 MOJO_DISCORD_LIB=$(PERL5LIB)/Mojo/Discord/lib
 
+#CACERT File
+CACERT=$(PERL5LIB)/Mozilla/CA/cacert.pem
+
 # Kill timer tells discordnp.pl to stop executing after the specified number of seconds. We can use this for pp to gather dependencies.
 KILL_TIMER=5
+
+define PP_ARGS
+		--execute \
+		--xargs="--config=$(CONFIG_FILE) --kill_timer=$(KILL_TIMER)" \
+		--cachedeps=build/depcache \
+		--addfile="$(ENTITIES_FILE);lib/Mojo/resources/html_entities.txt" \
+		--addfile="$(COMMANDS_FILE);lib/Mojolicious/Commands.pm" \
+		--addfile="$(IOLOOP_RESOURCES);lib/Mojo/IOLoop/resources" \
+		--addfile="$(CACERT);cacert.pem" \
+		--lib=$(MOJO_DISCORD_LIB) \
+		--lib=$(MOJO_WEBSERVICE_LASTFM_LIB) \
+		--lib=$(DISCORD_NP_LIB) \
+		--module="Mojo::IOLoop::TLS" \
+		--module="IO::Socket::SSL" \
+		--module="Net::SSLeay" \
+		--unicode 
+endef
 
 # File extension (Only used for Windows
 EXT=
 ifeq ($(OS),Windows_NT)
 	OSTYPE=windows
 	EXT=.exe
+	PP_ARGS+=--link=$(ZLIB) 
+	PP_ARGS+=--link=$(LIBCRYPTO) 
+	PP_ARGS+=--link=$(LIBSSL) 
 else
     UNAME_S:=$(shell uname -s)
     ifeq ($(UNAME_S),Linux)
@@ -40,20 +69,17 @@ else
     endif
 endif
 
+PP_ARGS+=--output="build/discordnp-$(OSTYPE)$(EXT)"
+
 default:
 	@echo "Building Discord-NP for $(OSTYPE)"
-	@pp \
-		--execute \
-		--xargs="--config=$(CONFIG_FILE) --kill_timer=$(KILL_TIMER)" \
-		--cachedeps=depcache \
-		--addfile="$(ENTITIES_FILE);lib/Mojo/resources/html_entities.txt" \
-		--addfile="$(COMMANDS_FILE);lib/Mojolicious/Commands.pm" \
-		--addfile="$(IOLOOP_RESOURCES);lib/Mojo/IOLoop/resources" \
-		--lib=$(MOJO_DISCORD_LIB) \
-		--lib=$(MOJO_WEBSERVICE_LASTFM_LIB) \
-		--lib=$(DISCORD_NP_LIB) \
-		--module="Mojo::IOLoop::TLS" \
-		--unicode \
-		--output="discordnp-$(OSTYPE)$(EXT)" \
-		../discordnp.pl
-	@echo "Wrote file: ./discordnp-$(OSTYPE)$(EXT)"
+	pp $(PP_ARGS) discordnp.pl
+	@echo "Wrote file: build/discordnp-$(OSTYPE)$(EXT)"
+
+clean:
+	rm build/depcache
+	rm build/discordnp-*
+
+cleanwin:
+	del build\depcache
+	del build\discordnp-windows.exe
