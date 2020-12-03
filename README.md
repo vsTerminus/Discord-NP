@@ -49,64 +49,127 @@ If you want to contribute to the code or just prefer to run the raw perl script 
 
 ### Linux, MacOS
 
+#### Install and Configure Perl + cpanminus
+
+**Install Perl**
 You should already have Perl. If you don't, you need at least v5.10 -- Install it with your package manager.
 On MacOS I recommend installing perl from Homebrew instead of system perl. It's probably not necessary for this particular project, but I recommend it in general.
 
-Also install "cpanminus", an excellent tool for managing CPAN modules.
+**Install cpanminus**
+cpanminus is an excellent tool for managing CPAN modules. Simpler and more powerful than the included CPAN shell. You may be able to install this through your package manager or you can install it with the `cpan install cpanminus` command. If you go the second route you'll have to go through the CPAN setup, which just asks you a number of questions you can (probably) just hit "Enter" and accept the defaults for every single one.
 
-Most of the dependencies can be installed automatically using `cpanm`, but there are two which are still manual installations until I can get them into CPAN.
-- [Mojo::Discord](https://github.com/vsTerminus/Mojo-Discord)
-- [Mojo::WebService::LastFM](https://github.com/vsTerminus/Mojo-WebService-LastFM)
+**Configure cpanminus**
+Perl can install modules to the system for all users (which requires sudo) or it can install to your home directory (a "local" lib(rary)) for your user alone. This doesn't require elevated permissions and is generally preferred. But you do need to set up a couple things:
 
-Once Perl and cpanminus are installed, these commands should get you going.
-Make sure your PERL5LIB env variable is set and valid.
+1. Set up your local lib
+
+You should add the following to either `~/.bash_profile` or `~/.zprofile` (or if you are using a shell other than bash or zsh, in that shell's profile file). Remember to replace "username" with your own username. Use your favorite text editor.
 
 ```bash
-# Check out the repositories
+PERL_MB_OPT='--install_base /home/username/perl5'; export PERL_MB_OPT;
+PERL_MM_OPT='INSTALL_BASE=/home/username/perl5'; export PERL_MM_OPT;
+PERL5LIB="/home/username/perl5/lib/perl5"; export PERL5LIB;
+PATH="/home/username/perl5/bin:$PATH"; export PATH;
+PERL_LOCAL_LIB_ROOT="/home/usename/perl5:$PERL_LOCAL_LIB_ROOT"; export PERL_LOCAL_LIB_ROOT;
+```
+
+Now either restart your terminal or re-source your profile (eg `source ~/.zprofile`)
+
+2. Configure cpanminus
+
+You should be able to just run 
+
+```bash
+cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
+```
+
+If you try to install something with cpanm it will complain and prompt you to do this anyway. 
+
+Now anything you install with cpanminus will go to the local lib in ~/perl5 instead of to a system directory.
+
+**Install Discord::NP**
+
+```bash
+# Clone the repository
 git clone https://github.com/vsTerminus/Discord-NP.git
+
+# Enter the project directory
+cd Discord-NP
+```
+
+In the root directory of this project you should see a file called "cpanfile" which contains a list of this project's dependencies. You can point cpanminus at it to install them:
+
+```bash
+cpanm --installdeps .
+```
+
+This will install everything except for one library: 
+
+**Install Mojo::Discord**
+
+[Mojo::Discord](https://github.com/vsTerminus/Mojo-Discord) is the library required for this application to connect to Discord in the first place. It will go up on CPAN eventually and then you'll be able to install it with cpanm, but it needs more unit tests and documentation first. So for now you'll have to install it manually.
+
+Luckily it's not too difficult:
+
+```bash
+# Check out the repository
 git clone https://github.com/vsTerminus/Mojo-Discord.git
-git clone https://github.com/vsTerminus/Mojo-WebService-LastFM.git
 
-# Create folders if needed
-mkdir -p $PERL5LIB/Mojo/WebService
+# Enter the project directory
+cd Mojo-Discord
 
-# Install Mojo::Discord and Mojo::WebService::LastFM
+# Install Mojo-Discord's dependencies
+cpanm --installdeps .
+
+# Manually install Mojo::Discord by creating symlinks inside your local lib
+# This way you can update it just by running "git pull" in the future.
 ln -s $PWD/Mojo-Discord/lib/Mojo/Discord.pm $PERL5LIB/Mojo/
 ln -s $PWD/Mojo-Discord/lib/Mojo/Discord $PERL5LIB/Mojo/
-ln -s $PWD/Mojo-WebService-LastFM/lib/Mojo/WebService/LastFM.pm $PERL5LIB/Mojo/WebService/LastFM.pm
+```
 
-# Install dependencies
-cd Mojo-Discord
-cpanm --installdeps .
-cd ../Mojo-WebService-LastFM
-cpanm --installdeps .
-cd ../Discord-NP
-cpanm --installdeps .
+To validate that both modules are installed, 
 
-# Create your personal config file by copying the example file
+```bash
+perl -MMojo::Discord -MMojo::WebService::LastFM -e 1
+```
+
+If you don't see any errors then you got it right. Congrats!
+
+**Configure the App**
+
+Create a copy of the example config file named "config.ini"
+
+```bash
 cp config.ini.example config.ini
 ```
 
-At this point you should be able to fill out config.ini and then run `perl discordnp.pl`
+Use your favorite text editor to fill it out as you saw in the first section of this readme.
 
-If you don't have a user lib you'll need to do this into your system perl lib directory as root instead.
+**Run the App**
+
+Should be as simple as
+
+```bash
+perl discordnp.pl
+```
+
+from inside the Discord::NP project folder. 
+
 
 ### Windows
 
 I recommend installing [Strawberry Perl](http://strawberryperl.com/), as it comes with cpanminus already installed.
 
-You need to check out three of my repositories:
+You need to check out two repositories
 
 - [Discord::NP](https://github.com/vsTerminus/Discord-NP) (This one!)
 - [Mojo::Discord](https://github.com/vsTerminus/Mojo-Discord) (For connecting to Discord)
-- [Mojo::WebService::LastFM](https://github.com/vsTerminus/Mojo-WebService-LastFM) (For a non-blocking connection to Last.FM)
 
 Clone each one using git
 
 ```cmd
 git clone https://github.com/vsTerminus/Discord-NP.git
 git clone https://github.com/vsTerminus/Mojo-Discord.git
-git clone https://github.com/vsTerminus/Mojo-WebService-LastFM.git
 ```
 
 Enter each folder and install the dependencies
@@ -114,13 +177,11 @@ Enter each folder and install the dependencies
 ```cmd
 cd Mojo-Discord
 cpanm --installdeps .
-cd ../Mojo-WebService-LastFM
-cpanm --installdeps .
 cd ../Discord-NP
 cpanm --installdeps .
 ```
 
-Next take the "Mojo" folder out of each of those three projects and drop it into `C:\Strawberry\perl\lib\` and choose Yes when it asks you if you would like to merge with the existing Net folder.
+Next grab a copy of the "Mojo" folder (inside /lib) and drop it into `C:\Strawberry\perl\lib\` and choose Yes when it asks you if you would like to merge with the existing Net folder.
 
 Finally, make a copy of config.ini.example in the Discord-NP project folder and rename it to "config.ini". Fill it out as normal.
 
@@ -130,21 +191,32 @@ That's it! Have fun.
 
 ## Build From Source
 
-### Linux, MacOS
+The build process is virtually identical for Mac, Windows, and Linux.
 
-You will need PAR::Packer, which you can install with cpanminus: `cpanm PAR::Packer`
+You will need two things: 'make' and 'pp'
 
-Now enter the "build" directory and run the "build.sh" script: `sh build.sh`
+'pp' is a utility provided by PAR::Packer, a perl module which you can install using cpanminus like so:
 
-If you're on Linux the script should finish and you should see a file named "discordnp-linux-gnu".
-On Mac, the file will be "discordnp-darwin\*" where \* is the version number (eg "darwin19.0")
+```bash
+cpanm pp
+```
 
-To run the file, just execute it. 
+'make' is something you should install with your package manager. On macOS you can use brew, on Windows I recommend using [Chocolatey](https://chocolatey.org/). (Once installed you run `choco install make` in an admin terminal and that's it)
 
-If your config.ini is in the same folder: `./discordnp-linux`
+Before you build, make sure you have a valid config.ini file in the project root *as well as in the 'build' folder*, I'll address that in a future update. The build process has to run the script to find dependencies, so having a valid config.ini is important.
 
-If config.ini is somewhere else: `./discordnp-linux --config=/path/to/config.ini`
+Finally, run
 
-### Windows
+```bash
+make
+```
 
-Not yet supported.
+and you should see it write the discordnp-OSTYPE file into the 'build' directory.
+
+# Troubleshooting
+
+Please, if you are having trouble open a ticket on the Issues tab. Let me know what's going on or what isn't clear so I can update it.
+
+You can also reach me on my discord, https://discord.gg/FuKTcHF
+
+I make no promises as to availability or time frames, but I will try to help you if I can.
