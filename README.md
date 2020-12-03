@@ -66,11 +66,11 @@ Perl can install modules to the system for all users (which requires sudo) or it
 You should add the following to either `~/.bash_profile` or `~/.zprofile` (or if you are using a shell other than bash or zsh, in that shell's profile file). Remember to replace "username" with your own username. Use your favorite text editor.
 
 ```bash
-PERL_MB_OPT='--install_base /home/username/perl5'; export PERL_MB_OPT;
-PERL_MM_OPT='INSTALL_BASE=/home/username/perl5'; export PERL_MM_OPT;
-PERL5LIB="/home/username/perl5/lib/perl5"; export PERL5LIB;
-PATH="/home/username/perl5/bin:$PATH"; export PATH;
-PERL_LOCAL_LIB_ROOT="/home/usename/perl5:$PERL_LOCAL_LIB_ROOT"; export PERL_LOCAL_LIB_ROOT;
+export PERL_MB_OPT='--install_base /home/username/perl5'
+export PERL_MM_OPT='INSTALL_BASE=/home/username/perl5'
+export PERL5LIB="/home/username/perl5/lib/perl5"
+export PATH="/home/username/perl5/bin:$PATH"
+export PERL_LOCAL_LIB_ROOT="/home/usename/perl5:$PERL_LOCAL_LIB_ROOT"
 ```
 
 Now either restart your terminal or re-source your profile (eg `source ~/.zprofile`)
