@@ -1,8 +1,10 @@
 # Discord Now Playing
 
+![GitHub](https://img.shields.io/github/license/vsTerminus/Discord-NP) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/vsTerminus/Discord-NP)
+
 This script will update your Discord "Listening to" status with whatever you are listening to according to Last.FM
 
-![Discord Screenshot](/img/sidebar-big.png)
+![Discord Screenshot](/img/sidebar-big.png) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/vsTerminus/Discord-NP)
 
 Setup will take a few minutes and requires two main things:
 
