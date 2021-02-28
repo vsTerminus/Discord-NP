@@ -12,13 +12,14 @@ WIN_LIBCRYPTO=$(STRAWBERRY_BIN)\LIBCRYPTO-1_1-X64__.DLL
 WIN_LIBSSL=$(STRAWBERRY_BIN)\LIBSSL-1_1-X64__.DLL
 
 # Shared Object dependencies for perl on Linux
-# This might be unnecessary - Leaving it commented until someone reports issues with missing shared objects.
+# Might be unnecessary - Leaving commented for now
 # LDD=$(shell ldd `which perl` | grep '=>' | cut -d' ' -f3 | sed 's/^/--link=/' | awk '{print}' ORS=' ')
 
 # Linux - Should be able to just get them from /usr/lib if they were installed with your package manager
 LIN_SO_DIR=/usr/lib
 LIN_LIBCRYPTO=$(LIN_SO_DIR)/libcrypto.so.1.1
 LIN_LIBSSL=$(LIN_SO_DIR)/libssl.so.1.1
+LIN_LIBCRYPT=$(LIN_SO_DIR)/libcrypt.so.2
 
 # OpenSSL Dynamic Libs for macOS
 # My openssl is installed via homebrew. Change as required.
@@ -85,6 +86,7 @@ else
         OSTYPE=linux
 		PP_ARGS+=--link=$(LIN_LIBCRYPTO)
 		PP_ARGS+=--link=$(LIN_LIBSSL)
+		PP_ARGS+=--link=$(LIN_LIBCRYPT)
 		#PP_ARGS+=$(LDD)
     endif
     ifeq ($(UNAME_S),Darwin)
