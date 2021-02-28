@@ -1,10 +1,30 @@
 # Make sure $PERL5LIB is defined and valid.
 
+# PAR::Packer does not seem to pick up OpenSSL shared libraries on any platform.
+# To remedy this we will manually specify the locations of libcrypto and libssl
+# Additionally Windows requires zlib
+
+# Windows - The DLLs we need are in the Strawberry Perl Installation Folder
 # Assumes default installation. Change as required.
 STRAWBERRY_BIN=C:\Strawberry\c\bin
-ZLIB=$(STRAWBERRY_BIN)\ZLIB1__.DLL
-LIBCRYPTO=$(STRAWBERRY_BIN)\LIBCRYPTO-1_1-X64__.DLL
-LIBSSL=$(STRAWBERRY_BIN)\LIBSSL-1_1-X64__.DLL
+WIN_ZLIB=$(STRAWBERRY_BIN)\ZLIB1__.DLL
+WIN_LIBCRYPTO=$(STRAWBERRY_BIN)\LIBCRYPTO-1_1-X64__.DLL
+WIN_LIBSSL=$(STRAWBERRY_BIN)\LIBSSL-1_1-X64__.DLL
+
+# Shared Object dependencies for perl on Linux
+# This might be unnecessary - Leaving it commented until someone reports issues with missing shared objects.
+# LDD=$(shell ldd `which perl` | grep '=>' | cut -d' ' -f3 | sed 's/^/--link=/' | awk '{print}' ORS=' ')
+
+# Linux - Should be able to just get them from /usr/lib if they were installed with your package manager
+LIN_SO_DIR=/usr/lib
+LIN_LIBCRYPTO=$(LIN_SO_DIR)/libcrypto.so.1.1
+LIN_LIBSSL=$(LIN_SO_DIR)/libssl.so.1.1
+
+# OpenSSL Dynamic Libs for macOS
+# My openssl is installed via homebrew. Change as required.
+MAC_DY_DIR=/usr/local/Cellar/openssl@1.1/1.1.1i/lib
+MAC_LIBCRYPTO=$(MAC_DY_DIR)/libcrypto.1.1.dylib
+MAC_LIBSSL=$(MAC_DY_DIR)/libssl.1.1.dylib
 
 # Point to a valid config file so the script can execute and PAR can collect dependencies.
 CONFIG_FILE=config.ini
@@ -56,16 +76,21 @@ EXT=
 ifeq ($(OS),Windows_NT)
 	OSTYPE=windows
 	EXT=.exe
-	PP_ARGS+=--link=$(ZLIB) 
-	PP_ARGS+=--link=$(LIBCRYPTO) 
-	PP_ARGS+=--link=$(LIBSSL) 
+	PP_ARGS+=--link=$(WIN_ZLIB) 
+	PP_ARGS+=--link=$(WIN_LIBCRYPTO) 
+	PP_ARGS+=--link=$(WIN_LIBSSL) 
 else
     UNAME_S:=$(shell uname -s)
     ifeq ($(UNAME_S),Linux)
         OSTYPE=linux
+		PP_ARGS+=--link=$(LIN_LIBCRYPTO)
+		PP_ARGS+=--link=$(LIN_LIBSSL)
+		#PP_ARGS+=$(LDD)
     endif
     ifeq ($(UNAME_S),Darwin)
         OSTYPE=macos
+		PP_ARGS+=--link=$(MAC_LIBCRYPTO)
+		PP_ARGS+=--link=$(MAC_LIBSSL)
     endif
 endif
 
