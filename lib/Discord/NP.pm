@@ -50,10 +50,10 @@ sub update_status
     $self->lastfm->nowplaying_p({ 'username' => $self->lastfm_user })->then(sub
     {   
         my $json = shift;
-        unless ( exists $json->{'artist'} and $json->{'title'} )
+        unless ( defined $json and exists $json->{'artist'} and $json->{'title'} )
         {
-            say "LastFM lookup failed:";
-            say Dumper($json);
+            #say "LastFM lookup failed:";
+            #say Dumper($json);
             return undef;
         }
         my $nowplaying = $json->{'artist'} . ' - ' . $json->{'title'};
