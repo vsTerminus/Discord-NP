@@ -33,7 +33,7 @@ has 'lastfm_user'   => ( is => 'ro' );
 has 'lastfm_key'    => ( is => 'ro' );
 has 'lastfm'        => ( is => 'lazy', builder => sub { Mojo::WebService::LastFM->new( api_key => shift->lastfm_key ) } );
 has 'my_id'         => ( is => 'rw' );
-has 'last_status'   => ( is => 'rw' );
+has 'last_status'   => ( is => 'rw', default => '' );
 has 'show_artist'   => ( is => 'ro' );
 has 'show_title'    => ( is => 'ro' );
 
@@ -75,7 +75,7 @@ sub update_status
                 'state' => $json->{'album'}
             });
 
-            say localtime(time) . " - Now Playing: $nowplaying";
+            say localtime(time) . " - Now Playing: $nowplaying" unless $nowplaying eq $self->last_status;
             $self->last_status($nowplaying);
         }
         else
