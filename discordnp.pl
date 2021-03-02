@@ -59,7 +59,7 @@ die("Could not read Discord Token value.\n" .
     "Expected: A string of letters, numbers, periods, hyphens, and underscores. No quotes, colons, spaces, or other characters.\n" .
     "Value as entered: \n" . $discord_token)
     unless length $discord_token > 0 and $discord_token =~ /^[A-Za-z0-9-_\.]+$/;
-say localtime(time) . " - Discord Token: OK (Ends with ". substr($discord_token, -4, 4) . ")";
+say localtime(time) . " - Discord Token: OK";
 
 # Make sure the LastFM API Key is defined and looks like a hex string
 my $lastfm_key = $config->{'lastfm'}{'api_key'};
@@ -68,7 +68,7 @@ die("Could not read LastFM API Key value.\n" .
     "Expected: A string of hexadecimal characters 0-9 and a-f. No special characters or spaces.\n" .
     "Value as entered: \n" . $lastfm_key)
     unless length $lastfm_key > 0 and $lastfm_key =~ /^[A-Fa-f0-9]+$/;
-say localtime(time) . " - LastFM API Key: OK (Ends with " . substr($lastfm_key, -4, 4) . ")";
+say localtime(time) . " - LastFM API Key: OK";
 
 # Make sure the LastFM Username is defined
 die("Could not read LastFM Username value.\n") unless exists $config->{'lastfm'}{'username'} and length $config->{'lastfm'}{'username'} > 0;
