@@ -33,7 +33,7 @@ has 'lastfm_user'   => ( is => 'ro' );
 has 'lastfm_key'    => ( is => 'ro' );
 has 'lastfm'        => ( is => 'lazy', builder => sub { Mojo::WebService::LastFM->new( api_key => shift->lastfm_key ) } );
 has 'my_id'         => ( is => 'rw' );
-has 'last_status'   => ( is => 'rw', default => '' );
+has 'last_status'   => ( is => 'rw', default => 'Nothing' );
 has 'show_artist'   => ( is => 'ro' );
 has 'show_title'    => ( is => 'ro' );
 
@@ -52,8 +52,8 @@ sub update_status
         my $json = shift;
         unless ( defined $json and exists $json->{'artist'} and $json->{'title'} )
         {
-            #say "LastFM lookup failed:";
-            #say Dumper($json);
+            say "LastFM lookup failed! Doing nothing.";
+            say Dumper($json);
             return undef;
         }
         my $nowplaying = $json->{'artist'} . ' - ' . $json->{'title'};
@@ -75,12 +75,13 @@ sub update_status
                 'state' => $json->{'album'}
             });
 
-            say localtime(time) . " - Now Playing: $nowplaying" unless $nowplaying eq $self->last_status;
+            ($nowplaying ne $self->last_status ) ? ( say localtime(time) . " - Now Playing: $nowplaying" ) : ( say localtime(time) . " - Still Playing: $nowplaying" );
             $self->last_status($nowplaying);
         }
         else
         {
-            if ( defined $self->last_status )
+            # Set 'Nothing' only once, and then let the status expire normally.
+            if ( $self->last_status ne 'Nothing' )
             {
                 $self->discord->status_update({
                     'name'  => 'Nothing',
@@ -88,11 +89,13 @@ sub update_status
                 });
 
                 say localtime(time) . " - Nothing is currently playing.";
-                $self->last_status(undef);
+                $self->last_status("Nothing");
             }
+            # else - User hasn't listened to anything since we set a 'Nothing' status, so "Still nothing"
         }
     })->catch(sub
     {
+        say "Last.FM lookup failed!";
         say Dumper(shift);
     });
 }
