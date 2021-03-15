@@ -33,7 +33,7 @@ has 'lastfm_user'   => ( is => 'ro' );
 has 'lastfm_key'    => ( is => 'ro' );
 has 'lastfm'        => ( is => 'lazy', builder => sub { Mojo::WebService::LastFM->new( api_key => shift->lastfm_key ) } );
 has 'my_id'         => ( is => 'rw' );
-has 'last_status'   => ( is => 'rw', default => 'Nothing' );
+has 'last_status'   => ( is => 'rw', default => '' );
 has 'show_artist'   => ( is => 'ro' );
 has 'show_title'    => ( is => 'ro' );
 
@@ -75,23 +75,22 @@ sub update_status
                 'state' => $json->{'album'}
             });
 
-            ($nowplaying ne $self->last_status ) ? ( say localtime(time) . " - Now Playing: $nowplaying" ) : ( say localtime(time) . " - Still Playing: $nowplaying" );
+            say localtime(time) . " - Now Playing: $nowplaying" if $nowplaying ne $self->last_status;
             $self->last_status($nowplaying);
         }
         else
         {
-            # Set 'Nothing' only once, and then let the status expire normally.
+            # Set 'Nothing' only once and remove the status message entirely
             if ( $self->last_status ne 'Nothing' )
             {
                 $self->discord->status_update({
-                    'name'  => 'Nothing',
-                    'type'  => 2
+                    'name'  => undef,
+                    'type'  => 0
                 });
 
                 say localtime(time) . " - Nothing is currently playing.";
                 $self->last_status("Nothing");
             }
-            # else - User hasn't listened to anything since we set a 'Nothing' status, so "Still nothing"
         }
     })->catch(sub
     {
