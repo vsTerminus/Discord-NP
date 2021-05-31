@@ -52,8 +52,8 @@ sub update_status
         my $json = shift;
         unless ( defined $json and exists $json->{'artist'} and $json->{'title'} )
         {
-            say "LastFM lookup failed! Doing nothing.";
-            say Dumper($json);
+            say "LastFM lookup failed!";
+            #say Dumper($json);
             return undef;
         }
         my $nowplaying = $json->{'artist'} . ' - ' . $json->{'title'};
