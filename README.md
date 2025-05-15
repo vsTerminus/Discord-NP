@@ -1,5 +1,13 @@
 # Discord Now Playing
 
+# Please Note: this project no longer works.
+
+Discord made changes to the way statuses are set on users. This script will still connect and claim to be working but nothing will appear on your profile in Discord.
+
+I don't have the time nor inclination right now to figure out how to fix it. For the foreseeable future you will need to find an alternative to this project.
+
+-------
+
 ![GitHub](https://img.shields.io/github/license/vsTerminus/Discord-NP) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/vsTerminus/Discord-NP)
 
 This script will update your Discord "Listening to" status with whatever you are listening to according to Last.FM
